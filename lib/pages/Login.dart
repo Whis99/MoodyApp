@@ -4,22 +4,23 @@ import 'package:moody/pages/Sign_up.dart';
 import 'package:moody/pages/mood_tracker.dart';
 
 class Login extends StatelessWidget {
+  static const String id = 'login';
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Login({super.key});
 
-  Future<void> _signInWithEmailAndPassword(BuildContext context, String email, String password) async {
+  Future<void> _signInWithEmailAndPassword(
+      BuildContext context, String email, String password) async {
     try {
       final user = await _auth.signInWithEmailAndPassword(
-        email: email, 
-        password: password
-      );
+          email: email, password: password);
       // Navigate to the next screen upon successful login
-      if (user.user != null){
+      if (user.user != null) {
         Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const MoodTracker()));
+            MaterialPageRoute(builder: (context) => const MoodTracker()));
       }
     } catch (e) {
       // Handle login errors
@@ -104,15 +105,14 @@ class Login extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUp())),
+                        onTap: () => Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => SignUp())),
                         child: const Text(
                           "Sign up",
                           style: TextStyle(
-                          fontSize: 15,
-                          color: Color.fromARGB(255, 0, 29, 158),
-                        ),
+                            fontSize: 15,
+                            color: Color.fromARGB(255, 0, 29, 158),
+                          ),
                         ),
                       ),
                     ],
