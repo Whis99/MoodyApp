@@ -31,6 +31,9 @@ class MyApp extends StatelessWidget {
         Login.id: (context) => Login(),
       },
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
     );
   }
 }

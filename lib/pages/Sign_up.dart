@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moody/components/firebaseService.dart';
-import 'package:moody/pages/mood_tracker.dart';
+import 'package:moody/pages/home.dart';
 // import 'package:moody/pages/Login.dart';
 
 class SignUp extends StatelessWidget {
@@ -31,8 +31,8 @@ class SignUp extends StatelessWidget {
 
       // Navigate to the next screen upon successful sign-up
       if (newUser.user != null) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const MoodTracker()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {

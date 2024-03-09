@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moody/pages/Sign_up.dart';
-import 'package:moody/pages/mood_tracker.dart';
+import 'package:moody/pages/home.dart';
 
 class Login extends StatelessWidget {
   static const String id = 'login';
@@ -19,8 +19,8 @@ class Login extends StatelessWidget {
           email: email, password: password);
       // Navigate to the next screen upon successful login
       if (user.user != null) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const MoodTracker()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
       }
     } catch (e) {
       // Handle login errors
@@ -62,6 +62,7 @@ class Login extends StatelessWidget {
                   const SizedBox(height: 20),
                   TextField(
                     controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Email',
                       border: OutlineInputBorder(
@@ -74,6 +75,7 @@ class Login extends StatelessWidget {
                   const SizedBox(height: 10),
                   TextField(
                     controller: _passwordController,
+                    keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Password',

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
 class FirebaseService {
@@ -29,6 +30,20 @@ class FirebaseService {
       print('Mood added successfully');
     } catch (e) {
       print('Error adding mood: $e');
+    }
+  }
+
+  // Retrieve a snapshot containing the user's name.
+  Future<String> getUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final docRef = _firestore.collection('users').doc(user!.uid);
+
+    final docSnapshot = await docRef.get();
+    if (docSnapshot.exists) {
+      return docSnapshot.data()!['name'] as String;
+    } else {
+      // Handle case where document doesn't exist
+      return 'User Not Found';
     }
   }
 }
