@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moody/components/firebaseService.dart';
 import 'package:moody/pages/home.dart';
 
 class SetMoodPage extends StatelessWidget {
@@ -17,9 +18,45 @@ class SetMoodPage extends StatelessWidget {
     'Love': '❤️',
     'Stressed': '😫',
     'Depressed': '😞',
-    'Meh': '😑',
-    // Add more moods and emojis as needed
+    'Meeeh': '😑',
   };
+
+  final FirebaseService firebaseService = FirebaseService();
+
+  SetMoodPage({super.key});
+
+  void _moodAlert(BuildContext context, String mood) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Mood alert",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
+          content: Text(
+            "Your mood is set to $mood",
+            style: const TextStyle(
+              fontSize: 15.0,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +99,7 @@ class SetMoodPage extends StatelessWidget {
               child: GridView.count(
                 crossAxisCount: 2,
                 children: moods.entries.map((entry) {
-                  return _buildMoodCard(entry.key, entry.value);
+                  return _buildMoodCard(context, entry.key, entry.value);
                 }).toList(),
               ),
             ),
@@ -72,9 +109,11 @@ class SetMoodPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMoodCard(String mood, String emoji) {
+  Widget _buildMoodCard(BuildContext context, String mood, String emoji) {
     return GestureDetector(
       onTap: () => {
+        _moodAlert(context, mood),
+        firebaseService.addMood(mood),
         print(mood),
       },
       child: Card(
