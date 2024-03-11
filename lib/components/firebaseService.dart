@@ -63,30 +63,6 @@ class FirebaseService {
     }
   }
 
-  // Future<Widget> getMostRecentUserMoodCard() async {
-  //   // Fetch the most recent mood for the user from Firestore
-  //   QuerySnapshot moodSnapshot = await _firestore
-  //       .collection('users')
-  //       .doc(user!.uid)
-  //       .collection('moods')
-  //       .orderBy('time', descending: true)
-  //       .limit(1)
-  //       .get();
-
-  //   // Check if there's any mood
-  //   if (moodSnapshot.docs.isEmpty) {
-  //     return SizedBox(); // Return an empty widget if no mood is found
-  //   }
-
-  //   // Extract mood data
-  //   String mood = moodSnapshot.docs.first['mood'];
-  //   String emoji = moodSnapshot.docs.first['emoji'];
-  //   Timestamp time = moodSnapshot.docs.first['time'];
-
-  //   // Create and return mood card
-  //   return MoodCard(mood: mood, emoji: emoji, time: time);
-  // }
-
   Stream<MoodData?> getRecentMood() async* {
     final user = FirebaseAuth.instance.currentUser;
 

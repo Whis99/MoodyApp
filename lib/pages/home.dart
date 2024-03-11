@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
@@ -28,36 +27,53 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 243, 243, 243),
       appBar: AppBar(
-        title: const Text("Moody"),
+        title: const Text(
+          "Moody",
+          style: TextStyle(
+            fontSize: 25.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
+        ),
         titleSpacing: 00.0,
         centerTitle: true,
         toolbarHeight: 60.2,
         toolbarOpacity: 0.9,
         elevation: 0.00,
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 252, 163, 247),
+              ),
+              child: showUserName(''),
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text(
+                'Sign Out',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20.0,
+                ),
+              ),
+              onTap: () async {
+                // await _auth.signOut();
+                // Navigate to sign-in screen or any other screen after sign out
+              },
+            ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
         child: ListView(
           children: [
-            FutureBuilder<String>(
-                future: _userName,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    print(snapshot.data);
-                    return Text(
-                      "Hi ${snapshot.data}",
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 25.0,
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-                  // Display a loading indicator while fetching
-                  return const Center(child: CircularProgressIndicator());
-                }),
+            showUserName("Welcome"),
             // SearchBar
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -90,6 +106,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData) {
+                  return moodCard(mood: '', emoji: '', time: '');
                 }
                 // Display a loading indicator while fetching
                 return const Center(child: CircularProgressIndicator());
@@ -101,6 +119,28 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  FutureBuilder<String> showUserName(String text) {
+    return FutureBuilder<String>(
+        future: _userName,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            return Text(
+              "$text ${snapshot.data}",
+              style: const TextStyle(
+                color: Colors.black54,
+                fontWeight: FontWeight.w600,
+                fontSize: 25.0,
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+          // Display a loading indicator while fetching
+          return const Center(child: CircularProgressIndicator());
+        });
   }
 
   Container userList() {
