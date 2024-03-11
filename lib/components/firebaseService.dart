@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:moody/components/moodData.dart';
+import 'package:moody/pages/login.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
 
 // Register user in Firestore
@@ -63,6 +66,7 @@ class FirebaseService {
     }
   }
 
+// Get user's recent mood rom firestore
   Stream<MoodData?> getRecentMood() async* {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -92,6 +96,19 @@ class FirebaseService {
     } catch (error) {
       print('Error fetching mood: $error');
       yield null; // Error
+    }
+  }
+
+  // Sign the user out of the application
+  Future<void> userSignOut(BuildContext context) async {
+    try {
+      await _auth.signOut();
+      // Navigate to sign-in screen sign out
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Login()));
+    } catch (e) {
+      // Handle sign-up errors
+      print('Error signing up: $e');
     }
   }
 }

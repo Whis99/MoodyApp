@@ -62,8 +62,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               onTap: () async {
-                // await _auth.signOut();
-                // Navigate to sign-in screen or any other screen after sign out
+                firebaseService.userSignOut(context);
               },
             ),
           ],
