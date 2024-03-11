@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:moody/components/moodData.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final user = FirebaseAuth.instance.currentUser;
 
 // Register user in Firestore
   Future<void> addUser(String userId, String name, String email) async {
@@ -20,8 +22,8 @@ class FirebaseService {
   }
 
 // Method to add the mood entry to Firestore.
-  Future<void> addMood(String mood) async {
-    final user = FirebaseAuth.instance.currentUser;
+  Future<void> addMood(String mood, String emoji) async {
+    // final user = FirebaseAuth.instance.currentUser;
     Timestamp timestamp = Timestamp.now();
 
     if (user == null) {
@@ -31,36 +33,25 @@ class FirebaseService {
       return;
     }
 
-    print(user.uid);
     try {
       await _firestore
           .collection('users')
-          .doc(user.uid) // Refer to the user's document
+          .doc(user!.uid) // Refer to the user's document
           .collection('moods') // Add to the moods subcollection
           .add({
         'mood': mood,
+        'emoji': emoji,
         'time': timestamp,
       });
       print('Mood added successfully');
     } catch (e) {
       print('Error adding mood: $e');
     }
-
-    // try {
-    //   await _firestore.collection('moods').add({
-    //     'userId': user.uid,
-    //     'mood': mood,
-    //     'time': timestamp,
-    //   });
-    //   print('Mood added successfully');
-    // } catch (e) {
-    //   print('Error adding mood: $e');
-    // }
   }
 
   // Retrieve a snapshot containing the user's name.
   Future<String> getUserName() async {
-    final user = FirebaseAuth.instance.currentUser;
+    // final user = FirebaseAuth.instance.currentUser;
     final docRef = _firestore.collection('users').doc(user!.uid);
 
     final docSnapshot = await docRef.get();
@@ -69,6 +60,62 @@ class FirebaseService {
     } else {
       // Handle case where document doesn't exist
       return 'User Not Found';
+    }
+  }
+
+  // Future<Widget> getMostRecentUserMoodCard() async {
+  //   // Fetch the most recent mood for the user from Firestore
+  //   QuerySnapshot moodSnapshot = await _firestore
+  //       .collection('users')
+  //       .doc(user!.uid)
+  //       .collection('moods')
+  //       .orderBy('time', descending: true)
+  //       .limit(1)
+  //       .get();
+
+  //   // Check if there's any mood
+  //   if (moodSnapshot.docs.isEmpty) {
+  //     return SizedBox(); // Return an empty widget if no mood is found
+  //   }
+
+  //   // Extract mood data
+  //   String mood = moodSnapshot.docs.first['mood'];
+  //   String emoji = moodSnapshot.docs.first['emoji'];
+  //   Timestamp time = moodSnapshot.docs.first['time'];
+
+  //   // Create and return mood card
+  //   return MoodCard(mood: mood, emoji: emoji, time: time);
+  // }
+
+  Stream<MoodData?> getRecentMood() async* {
+    final user = FirebaseAuth.instance.currentUser;
+
+    // Handle case where user is not authenticated
+    if (user == null) yield null;
+
+    try {
+      // Use the currently signed-in user's ID to access their moods subcollection in Firestore.
+      final moodsRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('moods');
+
+      // Query to retrieve the mood documents ordered by their time field in descending order,
+      // to get the most recent one first.
+      final moodQuery = moodsRef.orderBy('time', descending: true).limit(1);
+
+      final snapshot = await moodQuery.get();
+      if (snapshot.docs.isEmpty) yield null; // No moods
+
+      final moodData = snapshot.docs.first.data();
+      yield MoodData(
+        mood: moodData['mood'] as String,
+        emoji: moodData['emoji'] as String,
+        timeStamp: moodData['time'] as Timestamp,
+      );
+    } catch (error) {
+      print('Error fetching mood: $error');
+      yield null; // Error
     }
   }
 }

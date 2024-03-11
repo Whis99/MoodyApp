@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moody/components/firebaseService.dart';
+import 'package:moody/components/moodData.dart';
 import 'package:moody/pages/setMood.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,24 +43,24 @@ class _HomePageState extends State<HomePage> {
                 future: _userName,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    print(_userName);
+                    print(snapshot.data);
                     return Text(
-                      "Hi $_userName",
+                      "Hi ${snapshot.data}",
                       style: const TextStyle(
                         color: Colors.black54,
                         fontWeight: FontWeight.w600,
-                        fontSize: 20.0,
+                        fontSize: 25.0,
                       ),
                     );
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   }
                   // Display a loading indicator while fetching
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 }),
             // SearchBar
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: TextField(
                 decoration: InputDecoration(
                   hintText: "Search for a user",
@@ -72,8 +74,28 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            moodCard(),
-            setMood(),
+            // StreamBuilder is used to take user's mood in realtime from firestore after each update
+            StreamBuilder<MoodData?>(
+              stream: firebaseService.getRecentMood(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final moods = snapshot.data;
+                  print(moods!.mood);
+                  print(moods.emoji);
+                  print(moods.timeStamp);
+                  return moodCard(
+                    mood: moods.mood,
+                    emoji: moods.emoji,
+                    time: moods.timeConverter(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                // Display a loading indicator while fetching
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
+            setMoodCard(),
             userList(),
           ],
         ),
@@ -117,7 +139,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container setMood() {
+  Container setMoodCard() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
       padding: const EdgeInsets.all(20),
@@ -161,14 +183,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Card moodCard() {
+  Card moodCard(
+      {required String mood, required String emoji, required String time}) {
     return Card(
       elevation: 0,
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +207,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Spacer(),
                 Text(
-                  "😊",
+                  emoji,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0),
                 ), // Display mood emoji
               ],
@@ -193,14 +216,14 @@ class _HomePageState extends State<HomePage> {
             Row(
               children: [
                 Text(
-                  "Happy",
+                  mood,
                   style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 15.0,
                       color: Colors.black54),
                 ), // Display mood text
                 Spacer(),
-                Text("10:30 AM"), // Display mood time
+                Text("$time"), // Display mood time
               ],
             ),
           ],

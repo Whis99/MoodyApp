@@ -25,7 +25,7 @@ class SetMoodPage extends StatelessWidget {
 
   SetMoodPage({super.key});
 
-  void _moodAlert(BuildContext context, String mood) {
+  void _moodAlert(BuildContext context, String mood, String emoji) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -38,7 +38,7 @@ class SetMoodPage extends StatelessWidget {
             ),
           ),
           content: Text(
-            "Your mood is set to $mood",
+            "Your mood is set to $mood $emoji",
             style: const TextStyle(
               fontSize: 15.0,
               fontWeight: FontWeight.w500,
@@ -112,8 +112,8 @@ class SetMoodPage extends StatelessWidget {
   Widget _buildMoodCard(BuildContext context, String mood, String emoji) {
     return GestureDetector(
       onTap: () => {
-        _moodAlert(context, mood),
-        firebaseService.addMood(mood),
+        _moodAlert(context, mood, emoji),
+        firebaseService.addMood(mood, emoji),
         print(mood),
       },
       child: Card(
