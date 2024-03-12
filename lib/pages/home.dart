@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/moodData.dart';
+import 'package:moody/components/searchBar.dart';
 import 'package:moody/pages/setMood.dart';
 
 class HomePage extends StatefulWidget {
@@ -46,8 +47,8 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 252, 163, 247),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(66, 248, 119, 242),
               ),
               child: showUserName(''),
             ),
@@ -73,22 +74,23 @@ class _HomePageState extends State<HomePage> {
         child: ListView(
           children: [
             showUserName("Welcome"),
+            UserSearchBar(),
             // SearchBar
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search for a user",
-                  filled: true,
-                  fillColor: Colors.white,
-                  prefixIcon:
-                      const Icon(Icons.search, size: 30, color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(vertical: 20),
+            //   child: TextField(
+            //     decoration: InputDecoration(
+            //       hintText: "Search for a user",
+            //       filled: true,
+            //       fillColor: Colors.white,
+            //       prefixIcon:
+            //           const Icon(Icons.search, size: 30, color: Colors.black54),
+            //       border: OutlineInputBorder(
+            //         borderRadius: BorderRadius.circular(50),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             // StreamBuilder is used to take user's mood in realtime from firestore after each update
             StreamBuilder<MoodData?>(
               stream: firebaseService.getRecentMood(),
@@ -237,32 +239,36 @@ class _HomePageState extends State<HomePage> {
           children: [
             Row(
               children: [
-                Text(
+                const Text(
                   "Your Mood",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30.0,
                       color: Colors.black54),
                 ),
-                Spacer(),
+                const Spacer(),
                 Text(
                   emoji,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40.0),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 50.0),
                 ), // Display mood emoji
               ],
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Row(
               children: [
                 Text(
                   mood,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 15.0,
+                      fontSize: 19.0,
                       color: Colors.black54),
                 ), // Display mood text
-                Spacer(),
-                Text("$time"), // Display mood time
+                const Spacer(),
+                Text(
+                  time,
+                  style: const TextStyle(fontSize: 19.0, color: Colors.black54),
+                ), // Display mood time
               ],
             ),
           ],
