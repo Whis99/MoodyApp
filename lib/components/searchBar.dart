@@ -23,10 +23,66 @@ class _UserSearchBarState extends State<UserSearchBar> {
             .where('name', isGreaterThanOrEqualTo: query)
             .where('name',
                 isLessThanOrEqualTo:
-                    query + 'zzz') // Case-insensitive search (adjust as needed)
+                    query) // Case-insensitive search (adjust as needed)
             .snapshots()
             .map((snapshot) =>
                 snapshot.docs.map((doc) => doc['name'] as String).toList());
+  }
+
+  void _showUserDialog(BuildContext context, Widget content) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          icon: const Icon(
+            Icons.person_search_outlined,
+            size: 20.0,
+            color: Colors.black54,
+          ),
+          iconColor: Colors.black54,
+          content: content,
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Card userCard(String user) {
+    return Card(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Row(
+          children: [
+            Text(
+              user,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 25.0,
+                  color: Colors.black54),
+            ),
+            const Spacer(),
+            IconButton(
+              onPressed: () => {print('$user is followed')},
+              icon: const Icon(Icons.person_add_alt_1_outlined),
+              iconSize: 20.0,
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -46,59 +102,51 @@ class _UserSearchBarState extends State<UserSearchBar> {
               suffixIcon: IconButton(
                 onPressed: () {
                   final searchTerm = _searchController.text.trim();
+                  print('ispressed $searchTerm');
                   if (searchTerm.isNotEmpty) {
                     setState(() {
                       _userStream = searchUsers(searchTerm);
+                      if (_userStream != null) {
+                        // Display results only if stream exists
+                        StreamBuilder<List<String>>(
+                          stream: _userStream!,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return Text('Error: ${snapshot.error}');
+                            }
+
+                            if (snapshot.hasData) {
+                              final users = snapshot.data!;
+                              return ListView.builder(
+                                shrinkWrap:
+                                    true, // Prevent list from expanding unnecessarily
+                                itemCount: users.length,
+                                itemBuilder: (context, index) {
+                                  final user = users[index];
+                                  // Display user information here
+                                  print('USERNAME:====> $user');
+                                  return Text(user);
+                                },
+                              );
+                            }
+
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                        );
+                      }
                     });
                   }
                 },
-                icon:
-                    Icon(Icons.search_rounded, size: 30, color: Colors.black54),
+                icon: const Icon(Icons.search_rounded,
+                    size: 30, color: Colors.black54),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
-            // onChanged: (searchTerm) {
-            //   print(searchTerm);
-            //   if (searchTerm.isEmpty) {
-            //     setState(() {
-            //       _userStream = null; // Clear stream if search term is empty
-            //     });
-            //   } else {
-            //     _userStream = searchUsers(searchTerm);
-            //     print(
-            //         'USER RESULT===>: $_userStream'); // Trigger search on non-empty term
-            //   }
-            // },
           ),
-          if (_userStream != null) // Display results only if stream exists
-            StreamBuilder<List<String>>(
-              stream: _userStream!,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return Text('Error: ${snapshot.error}');
-                }
-
-                if (snapshot.hasData) {
-                  final users = snapshot.data!;
-                  return ListView.builder(
-                    shrinkWrap:
-                        true, // Prevent list from expanding unnecessarily
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-                      // ... display user information here
-                      print('USERNAME:====> $user');
-                      return Text(user);
-                    },
-                  );
-                }
-
-                return const Center(child: CircularProgressIndicator());
-              },
-            ),
         ],
       ),
     );
