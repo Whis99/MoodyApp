@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:moody/pages/login.dart';
+import 'package:moody/pages/loginPage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

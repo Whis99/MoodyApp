@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
-import 'package:moody/pages/home.dart';
+import 'package:moody/pages/homePage.dart';
 
 class SetMoodPage extends StatelessWidget {
   // Dictionary to store moods and emojis

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:moody/pages/Sign_up.dart';
-import 'package:moody/pages/home.dart';
+import 'package:moody/pages/sign_upPage.dart';
+import 'package:moody/pages/homePage.dart';
 
 class Login extends StatelessWidget {
-  static const String id = 'login';
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/moodData.dart';
 import 'package:moody/components/searchBar.dart';
-import 'package:moody/pages/setMood.dart';
+import 'package:moody/pages/setMoodPage.dart';
 
 // This class will be the first view to show when accessing the homepage
 // and also the first index of the bottom navigation bar
@@ -30,7 +30,8 @@ class _HomeViewState extends State<HomeView> {
       child: ListView(
         children: [
           showUserName("Welcome"),
-          UserSearchBar(),
+          const SizedBox(height: 10.0),
+          // UserSearchBar(),
           // SearchBar
           // Padding(
           //   padding: const EdgeInsets.symmetric(vertical: 20),

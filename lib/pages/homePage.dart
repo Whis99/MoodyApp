@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/homeView.dart';
-import 'package:moody/pages/search.dart';
+import 'package:moody/pages/searchPage.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
     return CurvedNavigationBar(
       backgroundColor: Colors.transparent,
       animationCurve: Curves.easeInOutCirc,
-      animationDuration: const Duration(milliseconds: 900),
+      animationDuration: const Duration(milliseconds: 500),
       height: 50,
       index: pageIndex,
       items: items,

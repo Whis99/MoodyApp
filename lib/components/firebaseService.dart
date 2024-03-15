@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moody/components/moodData.dart';
-import 'package:moody/pages/login.dart';
+import 'package:moody/pages/loginPage.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
 class FirebaseService {

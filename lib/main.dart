@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:moody/firebase_options.dart';
-import 'package:moody/pages/Sign_up.dart';
-import 'package:moody/pages/login.dart';
 import 'package:moody/pages/splashScreen.dart';
 
 Future<void> main() async {
@@ -24,12 +22,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       //This is initial page where the app will begin
       home: const SplashScreen(),
-      //List of all the pages will be referenced for routing
-      routes: {
-        SplashScreen.id: (context) => const SplashScreen(),
-        SignUp.id: (context) => SignUp(),
-        Login.id: (context) => Login(),
-      },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

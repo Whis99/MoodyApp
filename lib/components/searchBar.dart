@@ -98,48 +98,13 @@ class _UserSearchBarState extends State<UserSearchBar> {
               hintText: "Search for a user",
               filled: true,
               fillColor: Colors.white,
-              // prefixIcon:
-              //     const Icon(Icons.search, size: 30, color: Colors.black54),
               suffixIcon: IconButton(
                 onPressed: () {
                   final searchTerm = _searchController.text.trim();
-                  print('ispressed $searchTerm');
+                  print('SEARCHING FOR $searchTerm');
                   if (searchTerm.isNotEmpty) {
-                    setState(() {
-                      _userStream = searchUsers(searchTerm);
-                      if (_userStream != null) {
-                        // Display results only if stream exists
-                        // _showUserDialog(
-                        //   context,
-                        StreamBuilder<List<String>>(
-                          stream: _userStream!,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text('Error: ${snapshot.error}');
-                            }
-
-                            if (snapshot.hasData) {
-                              final users = snapshot.data!;
-                              return _showUserDialog(ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: users.length,
-                                itemBuilder: (context, index) {
-                                  final user = users[index];
-                                  // Display user information here
-                                  print('USERNAME:====> $user');
-                                  return Text(user);
-                                },
-                              ));
-                            }
-
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
-                          // ),
-                        );
-                      }
-                    });
+                    _userStream = searchUsers(searchTerm);
+                    print("Requesting...........................");
                   }
                 },
                 icon: const Icon(Icons.search_rounded,
@@ -150,6 +115,39 @@ class _UserSearchBarState extends State<UserSearchBar> {
               ),
             ),
           ),
+          if (_userStream != null)
+            // Display results only if stream exists
+            StreamBuilder<List<String>>(
+              stream: _userStream!,
+              builder: (context, snapshot) {
+                // print('Request complete====> $_userStream');
+                print('Stream Building..........................');
+                print('snapshot error...........................');
+
+                if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                print('Snapshot data...........................');
+                if (snapshot.hasData) {
+                  print('Data===========> ${snapshot.data}');
+                  final users = snapshot.data!;
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: users.length,
+                    itemBuilder: (context, index) {
+                      final user = users[index];
+                      // Display user information here
+                      print('USERNAME:====> $user');
+                      return Text(user);
+                    },
+                  );
+                }
+                print('Closing request............................');
+                return const Center(child: CircularProgressIndicator());
+              },
+            ),
         ],
       ),
     );
