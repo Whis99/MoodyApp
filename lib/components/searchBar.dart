@@ -29,30 +29,31 @@ class _UserSearchBarState extends State<UserSearchBar> {
                 snapshot.docs.map((doc) => doc['name'] as String).toList());
   }
 
-  void _showUserDialog(BuildContext context, Widget content) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+//A dialog box that pops up that contains the results of the search
+  Widget _showUserDialog(Widget content) {
+    return AlertDialog(
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+      icon: const Icon(
+        Icons.person_search_outlined,
+        size: 20.0,
+        color: Colors.black54,
+      ),
+      iconColor: Colors.black54,
+      content: content,
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // Close the dialog
+          },
           icon: const Icon(
-            Icons.person_search_outlined,
+            Icons.close_rounded,
             size: 20.0,
-            color: Colors.black54,
           ),
-          iconColor: Colors.black54,
-          content: content,
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
+        ),
+      ],
+      // );
+      // },
     );
   }
 
@@ -108,6 +109,8 @@ class _UserSearchBarState extends State<UserSearchBar> {
                       _userStream = searchUsers(searchTerm);
                       if (_userStream != null) {
                         // Display results only if stream exists
+                        // _showUserDialog(
+                        //   context,
                         StreamBuilder<List<String>>(
                           stream: _userStream!,
                           builder: (context, snapshot) {
@@ -118,9 +121,8 @@ class _UserSearchBarState extends State<UserSearchBar> {
 
                             if (snapshot.hasData) {
                               final users = snapshot.data!;
-                              return ListView.builder(
-                                shrinkWrap:
-                                    true, // Prevent list from expanding unnecessarily
+                              return _showUserDialog(ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: users.length,
                                 itemBuilder: (context, index) {
                                   final user = users[index];
@@ -128,12 +130,13 @@ class _UserSearchBarState extends State<UserSearchBar> {
                                   print('USERNAME:====> $user');
                                   return Text(user);
                                 },
-                              );
+                              ));
                             }
 
                             return const Center(
                                 child: CircularProgressIndicator());
                           },
+                          // ),
                         );
                       }
                     });
