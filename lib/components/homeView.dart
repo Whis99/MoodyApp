@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/moodData.dart';
-import 'package:moody/components/searchBar.dart';
 import 'package:moody/pages/setMoodPage.dart';
 
 // This class will be the first view to show when accessing the homepage
