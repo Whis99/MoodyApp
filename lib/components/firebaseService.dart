@@ -3,13 +3,87 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moody/components/moodData.dart';
 import 'package:moody/components/userdata.dart';
+import 'package:moody/pages/homePage.dart';
 import 'package:moody/pages/loginPage.dart';
+
+import 'utils.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
+
+  // Authenticate user with email and password
+  Future<void> signInWithEmailAndPassword(
+      BuildContext context, String email, String password) async {
+    try {
+      final user = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      // Navigate to the next screen upon successful login
+      if (user.user != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        print('Password incorrect.');
+        Utils.displayDialog(
+            context, "Wrong password", 'Password is incorrect.');
+      } else if (e.code == 'invalid-email') {
+        print('Email invalid.');
+        Utils.displayDialog(context, "Invalid email", 'Email is incorrect.');
+      } else if (e.code == 'user-not-found') {
+        print('This user does not exist.');
+        Utils.displayDialog(
+            context, "User not found", 'This user does not exist.');
+      }
+    } catch (e) {
+      // Handle login errors
+      print('Error signing in: $e');
+      Utils.displayDialog(context, "Error", 'Error signing in: $e');
+    }
+  }
+
+  // Create user account with email and password into firestore
+  Future<void> signUpWithEmailAndPassword(
+      BuildContext context, String name, String email, String password) async {
+    try {
+      final newUser = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+      // Get the user ID from the User object
+      final String userId = newUser.user!.uid;
+
+      // Add user to Firestore after account been created
+      addUser(userId, name, email);
+
+      // Navigate to the next screen upon successful sign-up
+      if (newUser.user != null) {
+        Utils.displayDialog(context, "Succes", 'Account created succesfully.');
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+        Utils.displayDialog(context, "Email already in use",
+            'The account already exists for that email.');
+      } else if (e.code == 'invalid-email') {
+        print('Email address is not valid.');
+        Utils.displayDialog(
+            context, "Invalid email", 'Email address is not valid.');
+      } else if (e.code == 'weak-password') {
+        print('Password should be at least 6 characters');
+        Utils.displayDialog(context, "Weak password",
+            'Password should be at least 6 characters.');
+      }
+    } catch (e) {
+      // Handle sign-up errors
+      print('Error signing up: $e');
+      Utils.displayDialog(context, "Error", 'Error signing in: $e');
+    }
+  }
 
   // Register user in Firestore
   Future<void> addUser(String userId, String name, String email) async {
@@ -167,21 +241,23 @@ class FirebaseService {
             ? moodsSnapshot.docs.first.data()['mood'] as String
             : 'No mood';
 
-        final emojiSnapshot = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('moods')
-            .orderBy('time', descending: true)
-            .limit(1)
-            .get();
-        final moodEmoji = emojiSnapshot.docs.isNotEmpty
-            ? emojiSnapshot.docs.first.data()['emoji'] as String
+        final moodEmoji = moodsSnapshot.docs.isNotEmpty
+            ? moodsSnapshot.docs.first.data()['emoji'] as String
+            : '';
+
+        final moodTime = moodsSnapshot.docs.isNotEmpty
+            ? moodsSnapshot.docs.first.data()['time']
             : '';
 
         print('USER name=============> $userName');
         print('USER mood=============> $userMood');
         print('USER emoji=============> $moodEmoji');
-        return UserData(name: userName, mood: userMood, emoji: moodEmoji);
+        print('MOOD time =============> $moodTime');
+        return UserData(
+            name: userName,
+            mood: userMood,
+            emoji: moodEmoji,
+            timeStamp: moodTime);
       });
 
       print('===============USER SNAPSHOTS LOADING================');

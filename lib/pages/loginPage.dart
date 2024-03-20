@@ -1,30 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:moody/components/firebaseService.dart';
 import 'package:moody/pages/sign_upPage.dart';
-import 'package:moody/pages/homePage.dart';
 
 class Login extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseService firebaseService = FirebaseService();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Login({super.key});
-
-  Future<void> _signInWithEmailAndPassword(
-      BuildContext context, String email, String password) async {
-    try {
-      final user = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      // Navigate to the next screen upon successful login
-      if (user.user != null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-      }
-    } catch (e) {
-      // Handle login errors
-      print('Error signing in: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +74,8 @@ class Login extends StatelessWidget {
                       //login logic here
                       String email = _emailController.text.trim();
                       String password = _passwordController.text.trim();
-                      _signInWithEmailAndPassword(context, email, password);
+                      firebaseService.signInWithEmailAndPassword(
+                          context, email, password);
                     },
                     child: const Text('Login'),
                   ),
