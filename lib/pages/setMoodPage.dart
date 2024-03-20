@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
+import 'package:moody/components/utils.dart';
 import 'package:moody/pages/homePage.dart';
 
 class SetMoodPage extends StatelessWidget {
@@ -24,39 +25,6 @@ class SetMoodPage extends StatelessWidget {
   final FirebaseService firebaseService = FirebaseService();
 
   SetMoodPage({super.key});
-
-  void _moodAlert(BuildContext context, String mood, String emoji) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "Mood alert",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
-            ),
-          ),
-          content: Text(
-            "Your mood is set to $mood $emoji",
-            style: const TextStyle(
-              fontSize: 15.0,
-              fontWeight: FontWeight.w500,
-              color: Colors.black54,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +80,8 @@ class SetMoodPage extends StatelessWidget {
   Widget _buildMoodCard(BuildContext context, String mood, String emoji) {
     return GestureDetector(
       onTap: () => {
-        _moodAlert(context, mood, emoji),
+        Utils.displayDialog(
+            context, 'Mood alert', 'Your mood is set to $mood $emoji'),
         firebaseService.addMood(mood, emoji),
         print(mood),
       },
@@ -132,10 +101,10 @@ class SetMoodPage extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 emoji,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 30,
                 ),
               ),

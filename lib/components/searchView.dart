@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:moody/components/firebaseService.dart';
+import 'package:moody/components/utils.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -36,7 +37,7 @@ class _SearchViewState extends State<SearchView> {
   Card userCard(var user, String userId) {
     return Card(
       elevation: 1,
-      surfaceTintColor: Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color.fromARGB(255, 255, 255, 255),
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -57,6 +58,8 @@ class _SearchViewState extends State<SearchView> {
               onPressed: () => {
                 print('$user is followed'),
                 firebaseService.followUser(userId),
+                Utils.displayDialog(
+                    context, 'Following', 'You have followed $user'),
                 print('USERID=====> $userId'),
               },
               icon: const Icon(Icons.person_add_alt_1_outlined),
@@ -73,53 +76,55 @@ class _SearchViewState extends State<SearchView> {
     var search = '';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: "Search for a user",
-              filled: true,
-              fillColor: Colors.white,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  search = _searchController.text.trim();
-                  print('SEARCHING FOR $search');
-                  setState(() {
-                    searchUsers(search);
-                    print(searchUsers(search));
-                  });
-                },
-                icon: const Icon(Icons.search_rounded,
-                    size: 30, color: Colors.black54),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(50),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search for a user",
+                filled: true,
+                fillColor: Colors.white,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    search = _searchController.text.trim();
+                    print('SEARCHING FOR $search');
+                    setState(() {
+                      searchUsers(search);
+                      print(searchUsers(search));
+                    });
+                  },
+                  icon: const Icon(Icons.search_rounded,
+                      size: 30, color: Colors.black54),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                ),
               ),
             ),
-          ),
-          StreamBuilder<QuerySnapshot>(
-              stream: searchUsers(search),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return Text('Error: ${snapshot.error}');
-                }
+            StreamBuilder<QuerySnapshot>(
+                stream: searchUsers(search),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Text('Error: ${snapshot.error}');
+                  }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                final users = snapshot.data!.docs;
-                return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      var data = users[index];
-                      return userCard(data['name'], data.id.toString());
-                    });
-              }),
-        ],
+                  final users = snapshot.data!.docs;
+                  return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: users.length,
+                      itemBuilder: (context, index) {
+                        var data = users[index];
+                        return userCard(data['name'], data.id.toString());
+                      });
+                }),
+          ],
+        ),
       ),
     );
   }

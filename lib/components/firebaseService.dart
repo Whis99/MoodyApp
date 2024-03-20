@@ -60,6 +60,7 @@ class FirebaseService {
 
       // Navigate to the next screen upon successful sign-up
       if (newUser.user != null) {
+        Utils.displayDialog(context, "Succes", 'Account created succesfully.');
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => HomePage()));
       }
@@ -240,21 +241,23 @@ class FirebaseService {
             ? moodsSnapshot.docs.first.data()['mood'] as String
             : 'No mood';
 
-        final emojiSnapshot = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('moods')
-            .orderBy('time', descending: true)
-            .limit(1)
-            .get();
-        final moodEmoji = emojiSnapshot.docs.isNotEmpty
-            ? emojiSnapshot.docs.first.data()['emoji'] as String
+        final moodEmoji = moodsSnapshot.docs.isNotEmpty
+            ? moodsSnapshot.docs.first.data()['emoji'] as String
+            : '';
+
+        final moodTime = moodsSnapshot.docs.isNotEmpty
+            ? moodsSnapshot.docs.first.data()['time']
             : '';
 
         print('USER name=============> $userName');
         print('USER mood=============> $userMood');
         print('USER emoji=============> $moodEmoji');
-        return UserData(name: userName, mood: userMood, emoji: moodEmoji);
+        print('MOOD time =============> $moodTime');
+        return UserData(
+            name: userName,
+            mood: userMood,
+            emoji: moodEmoji,
+            timeStamp: moodTime);
       });
 
       print('===============USER SNAPSHOTS LOADING================');

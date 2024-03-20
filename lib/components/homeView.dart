@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/moodData.dart';
 import 'package:moody/components/userdata.dart';
+import 'package:moody/components/utils.dart';
 import 'package:moody/pages/setMoodPage.dart';
 
 // This class will be the first view to show when accessing the homepage
@@ -43,7 +44,7 @@ class _HomeViewState extends State<HomeView> {
                 return moodCard(
                   mood: moods.mood,
                   emoji: moods.emoji,
-                  time: moods.timeConverter(),
+                  time: Utils.timeConverter(moods.timeStamp),
                 );
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
@@ -144,6 +145,11 @@ class _HomeViewState extends State<HomeView> {
                         fontWeight: FontWeight.w400,
                         fontSize: 15.0,
                         color: Colors.black54),
+                  ),
+                  trailing: Text(
+                    Utils.timeConverter(user.timeStamp),
+                    style:
+                        const TextStyle(fontSize: 15.0, color: Colors.black54),
                   ),
                   leading: CircleAvatar(
                     backgroundColor: Colors.transparent,
