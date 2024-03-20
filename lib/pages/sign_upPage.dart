@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:moody/components/firebaseService.dart';
-import 'package:moody/pages/homePage.dart';
+import 'package:moody/components/utils.dart';
 // import 'package:moody/pages/Login.dart';
 
 class SignUp extends StatelessWidget {
   static const String id = 'signUp';
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseService firebaseService = FirebaseService();
 
   final TextEditingController _nameController = TextEditingController();
@@ -16,55 +14,6 @@ class SignUp extends StatelessWidget {
   final TextEditingController _password2Controller = TextEditingController();
 
   SignUp({super.key});
-
-  Future<void> _signUpWithEmailAndPassword(
-      BuildContext context, String name, String email, String password) async {
-    try {
-      final newUser = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
-      // Get the user ID from the User object
-      final String userId = newUser.user!.uid;
-
-      // Add user to Firestore after account been created
-      firebaseService.addUser(userId, name, email);
-
-      // Navigate to the next screen upon successful sign-up
-      if (newUser.user != null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-        _showDialog(context, "Email already in use",
-            'The account already exists for that email.');
-      }
-    } catch (e) {
-      // Handle sign-up errors
-      print('Error signing up: $e');
-    }
-  }
-
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,16 +113,13 @@ class SignUp extends StatelessWidget {
                             email.isEmpty ||
                             password.isEmpty ||
                             password2.isEmpty) {
-                          _showDialog(context, 'Field empty',
+                          Utils.displayDialog(context, 'Field empty',
                               'Please fill all the fields.');
-                        } else if (password.length < 6) {
-                          _showDialog(context, 'Password too short',
-                              'Password should be at least 6 characters');
                         } else if (password != password2) {
-                          _showDialog(context, 'Password not match',
+                          Utils.displayDialog(context, 'Password not match',
                               'The passwords do not match. Please try again.');
                         } else {
-                          _signUpWithEmailAndPassword(
+                          firebaseService.signUpWithEmailAndPassword(
                               context, name, email, password);
                         }
                       },

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:moody/components/firebaseService.dart';
 
-class UserSearchBar extends StatefulWidget {
-  const UserSearchBar({super.key});
+class SearchView extends StatefulWidget {
+  const SearchView({super.key});
 
   @override
-  State<UserSearchBar> createState() => _UserSearchBarState();
+  State<SearchView> createState() => _SearchViewState();
 }
 
-class _UserSearchBarState extends State<UserSearchBar> {
+class _SearchViewState extends State<SearchView> {
   final _searchController = TextEditingController();
   final FirebaseService firebaseService = FirebaseService();
 

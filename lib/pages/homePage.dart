@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/homeView.dart';
 import 'package:moody/pages/searchPage.dart';
+import 'package:moody/pages/settingsPage.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -18,10 +19,7 @@ class _HomePageState extends State<HomePage> {
   int pageIndex = 0;
 
   // List of pages displayed in the bottom navigation bar
-  final pages = [
-    const HomeView(),
-    const SearchPage(),
-  ];
+  final pages = [const HomeView(), const SearchPage(), const Settings()];
 
   // Icon widget for the navigation
   Icon navIcon(IconData data) {
@@ -38,6 +36,7 @@ class _HomePageState extends State<HomePage> {
     final items = <Icon>[
       navIcon(Icons.home),
       navIcon(Icons.search_rounded),
+      navIcon(Icons.settings)
     ];
 
     return Scaffold(
@@ -56,27 +55,6 @@ class _HomePageState extends State<HomePage> {
         toolbarHeight: 60.2,
         toolbarOpacity: 0.9,
         elevation: 0.00,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 20.0,
-                ),
-              ),
-              onTap: () async {
-                firebaseService.userSignOut(context);
-              },
-            ),
-          ],
-        ),
       ),
       body: pages[pageIndex],
       bottomNavigationBar: bottomNavigation(
