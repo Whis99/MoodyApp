@@ -38,6 +38,8 @@ dependencies:
   firebase_core: ^2.26.0
   firebase_auth: ^4.17.7
   cloud_firestore: ^4.15.7
+  easy_search_bar: ^2.5.0
+  curved_navigation_bar: ^1.0.3
 
 dev_dependencies:
   flutter_test:
