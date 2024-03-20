@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moody/components/firebaseService.dart';
 import 'package:moody/components/moodData.dart';
+import 'package:moody/components/userdata.dart';
 import 'package:moody/pages/setMoodPage.dart';
 
 // This class will be the first view to show when accessing the homepage
@@ -54,6 +55,13 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
           setMoodCard(),
+          const Text(
+            'Following',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 25.0,
+                color: Colors.black54),
+          ),
           userList(),
         ],
       ),
@@ -103,17 +111,47 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
       child: SingleChildScrollView(
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: 10, // Replace with actual count of followed users
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text("Followed User ${index + 1}"),
-              subtitle: const Text("Mood: Happy"),
-              leading: CircleAvatar(
-                child: Text((index + 1).toString()),
-              ),
+        child: FutureBuilder<List<UserData>>(
+          future: firebaseService.getFollowingUsers(),
+          builder: (BuildContext context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              print(snapshot.error);
+              return Text('Error: ${snapshot.error}');
+            }
+            final users = snapshot.data!;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount:
+                  users.length, // Replace with actual count of followed users
+              itemBuilder: (context, index) {
+                final user = users[index];
+                return ListTile(
+                  title: Text(
+                    user.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20.0,
+                        color: Colors.black54),
+                  ),
+                  subtitle: Text(
+                    user.mood,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 15.0,
+                        color: Colors.black54),
+                  ),
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    child: Text(user.emoji,
+                        style: const TextStyle(fontSize: 25.0)),
+                  ),
+                );
+              },
             );
           },
         ),

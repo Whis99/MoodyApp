@@ -135,34 +135,63 @@ class FirebaseService {
     }
   }
 
+  // Query usernames and moods based on user IDs from the following list
   Future<List<UserData>> getFollowingUsers() async {
-    final followingList = await _firestore
-        .collection('users')
-        .doc(user!.uid)
-        .get()
-        .then((snapshot) =>
-            snapshot.data()?['following'] as List); // Get following IDs
+    try {
+      final followingList = await _firestore
+          .collection('users')
+          .doc(user!.uid)
+          .get()
+          .then((snapshot) =>
+              snapshot.data()?['following'] as List); // Get following IDs
 
-    if (followingList.isEmpty) {
-      return []; // Return empty list if no following users
+      print('Following list=====> $followingList');
+      if (followingList.isEmpty) {
+        print('List empty');
+        return []; // Return empty list if no following users
+      }
+
+      print('===============USER FUTURES================');
+      final userFutures = followingList.map((userId) async {
+        final userDoc = await _firestore.collection('users').doc(userId).get();
+        final userName = userDoc.data()?['name'] as String;
+
+        final moodsSnapshot = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('moods')
+            .orderBy('time', descending: true)
+            .limit(1)
+            .get();
+        final userMood = moodsSnapshot.docs.isNotEmpty
+            ? moodsSnapshot.docs.first.data()['mood'] as String
+            : 'No mood';
+
+        final emojiSnapshot = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('moods')
+            .orderBy('time', descending: true)
+            .limit(1)
+            .get();
+        final moodEmoji = emojiSnapshot.docs.isNotEmpty
+            ? emojiSnapshot.docs.first.data()['emoji'] as String
+            : '';
+
+        print('USER name=============> $userName');
+        print('USER mood=============> $userMood');
+        print('USER emoji=============> $moodEmoji');
+        return UserData(name: userName, mood: userMood, emoji: moodEmoji);
+      });
+
+      print('===============USER SNAPSHOTS LOADING================');
+      // Wait for all futures to complete
+      final users = await Future.wait(userFutures);
+      print('USERS===========> $users');
+      return users;
+    } catch (e) {
+      print('Error getting following users: $e');
+      return [];
     }
-
-    final userFutures = followingList.map((userId) => _firestore
-        .collection('users')
-        .doc(userId)
-        .get()); // Create futures for each user
-
-    final userSnapshots =
-        await Future.wait(userFutures); // Wait for all futures to complete
-
-    final users = userSnapshots
-        .map((snapshot) => UserData(
-              name: snapshot.data()?['name'] as String,
-              mood: snapshot.data()?['mood'] as String,
-              emoji: snapshot.data()?['emoji'] as String,
-            ))
-        .toList(); // Extract user data and create User objects
-
-    return users;
   }
 }
