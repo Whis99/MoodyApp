@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:moody/components/firebaseService.dart';
 
 class UserSearchBar extends StatefulWidget {
   const UserSearchBar({super.key});
@@ -12,6 +13,8 @@ class UserSearchBar extends StatefulWidget {
 
 class _UserSearchBarState extends State<UserSearchBar> {
   final _searchController = TextEditingController();
+  final FirebaseService firebaseService = FirebaseService();
+
   // Stream<List<String>>?
   //     _userStream; // Stream for search results (initially null)
 
@@ -30,35 +33,7 @@ class _UserSearchBarState extends State<UserSearchBar> {
     //     snapshot.docs.map((doc) => doc['name'] as String).toList());
   }
 
-//A dialog box that pops up that contains the results of the search
-  // Widget _showUserDialog(Widget content) {
-  //   return AlertDialog(
-  //     backgroundColor: const Color.fromARGB(255, 240, 240, 240),
-  //     icon: const Icon(
-  //       Icons.person_search_outlined,
-  //       size: 20.0,
-  //       color: Colors.black54,
-  //     ),
-  //     iconColor: Colors.black54,
-  //     content: content,
-  //     actionsAlignment: MainAxisAlignment.center,
-  //     actions: [
-  //       IconButton(
-  //         onPressed: () {
-  //           Navigator.of(context).pop(); // Close the dialog
-  //         },
-  //         icon: const Icon(
-  //           Icons.close_rounded,
-  //           size: 20.0,
-  //         ),
-  //       ),
-  //     ],
-  //     // );
-  //     // },
-  //   );
-  // }
-
-  Card userCard(var user) {
+  Card userCard(var user, String userId) {
     return Card(
       elevation: 1,
       surfaceTintColor: Color.fromARGB(255, 255, 255, 255),
@@ -79,7 +54,11 @@ class _UserSearchBarState extends State<UserSearchBar> {
             ),
             const Spacer(),
             IconButton(
-              onPressed: () => {print('$user is followed')},
+              onPressed: () => {
+                print('$user is followed'),
+                firebaseService.followUser(userId),
+                print('USERID=====> $userId'),
+              },
               icon: const Icon(Icons.person_add_alt_1_outlined),
               iconSize: 20.0,
             )
@@ -92,7 +71,6 @@ class _UserSearchBarState extends State<UserSearchBar> {
   @override
   Widget build(BuildContext context) {
     var search = '';
-    // var search;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
@@ -123,7 +101,6 @@ class _UserSearchBarState extends State<UserSearchBar> {
           StreamBuilder<QuerySnapshot>(
               stream: searchUsers(search),
               builder: (context, snapshot) {
-                // print(snapshot.data!.docs.first['name']);
                 if (snapshot.hasError) {
                   print(snapshot.error);
                   return Text('Error: ${snapshot.error}');
@@ -139,7 +116,7 @@ class _UserSearchBarState extends State<UserSearchBar> {
                     itemCount: users.length,
                     itemBuilder: (context, index) {
                       var data = users[index];
-                      return userCard(data['name']);
+                      return userCard(data['name'], data.id.toString());
                     });
               }),
         ],

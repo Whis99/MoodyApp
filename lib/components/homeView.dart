@@ -30,23 +30,6 @@ class _HomeViewState extends State<HomeView> {
         children: [
           showUserName("Welcome"),
           const SizedBox(height: 10.0),
-          // UserSearchBar(),
-          // SearchBar
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(vertical: 20),
-          //   child: TextField(
-          //     decoration: InputDecoration(
-          //       hintText: "Search for a user",
-          //       filled: true,
-          //       fillColor: Colors.white,
-          //       prefixIcon:
-          //           const Icon(Icons.search, size: 30, color: Colors.black54),
-          //       border: OutlineInputBorder(
-          //         borderRadius: BorderRadius.circular(50),
-          //       ),
-          //     ),
-          //   ),
-          // ),
           // StreamBuilder is used to take user's mood in realtime from firestore after each update
           StreamBuilder<MoodData?>(
             stream: firebaseService.getRecentMood(),
@@ -104,8 +87,8 @@ class _HomeViewState extends State<HomeView> {
   // A container that will display all the users the current user has followed
   Container userList() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 20),
-      padding: EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.all(20),
       height: 350.0,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -140,46 +123,46 @@ class _HomeViewState extends State<HomeView> {
 
   // Redirects the user to the page where he/she will select is/her current mood. The mood will
   // be sent to firestore and it will also be displayed in the homepage.
-  Container setMoodCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 3,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Text(
-            "Set a Mood",
-            style: TextStyle(
-              fontSize: 25.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black54,
+  Widget setMoodCard() {
+    return GestureDetector(
+      onTap: () {
+        // Handle click
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => SetMoodPage()));
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 3,
+              offset: Offset(0, 2),
             ),
-          ),
-          Spacer(),
-          IconButton(
-            onPressed: () {
-              // Handle click
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => SetMoodPage()));
-            },
-            icon: const Icon(
+          ],
+        ),
+        child: const Row(
+          children: [
+            Text(
+              "Set a Mood",
+              style: TextStyle(
+                fontSize: 25.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+              ),
+            ),
+            Spacer(),
+            Icon(
               Icons.arrow_forward_ios_rounded,
               size: 30.0,
               color: Colors.black54,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

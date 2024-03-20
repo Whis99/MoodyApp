@@ -11,11 +11,11 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 25, 20, 10),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 25, 20, 10),
       child: Column(
         children: [
-          const UserSearchBar(),
+          UserSearchBar(),
           // const SizedBox(height: 5.0),
           // ListView(
           //   children: const [],

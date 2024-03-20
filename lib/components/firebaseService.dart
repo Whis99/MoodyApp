@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:moody/components/moodData.dart';
+import 'package:moody/components/userdata.dart';
 import 'package:moody/pages/loginPage.dart';
 
 // Class to interact with Firestore to handle user data and mood entries
@@ -10,7 +11,7 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
 
-// Register user in Firestore
+  // Register user in Firestore
   Future<void> addUser(String userId, String name, String email) async {
     try {
       await _firestore.collection('users').doc(userId).set({
@@ -24,7 +25,7 @@ class FirebaseService {
     }
   }
 
-// Method to add the mood entry to Firestore.
+  // Method to add the mood entry to Firestore.
   Future<void> addMood(String mood, String emoji) async {
     // final user = FirebaseAuth.instance.currentUser;
     Timestamp timestamp = Timestamp.now();
@@ -32,7 +33,6 @@ class FirebaseService {
     if (user == null) {
       // Handle the case where the user is not authenticated
       print('User is not authenticated');
-      // Consider prompting for login or displaying an error message
       return;
     }
 
@@ -52,6 +52,29 @@ class FirebaseService {
     }
   }
 
+  // Add followed users into the following list to firestore
+  Future<void> followUser(String userId) async {
+    if (user == null) {
+      // Handle the case where the user is not authenticated
+      print('User is not authenticated');
+      return;
+    }
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(user!.uid) // Refer to the user's document
+          // Method to modify the following array.
+          .update({
+        // A merge operation that appends the userId to the existing array without overwriting it
+        'following': FieldValue.arrayUnion([userId])
+      });
+      print('User followed successfully');
+    } catch (e) {
+      print('Error following user: $e');
+    }
+  }
+
   // Retrieve a snapshot containing the user's name.
   Future<String> getUserName() async {
     // final user = FirebaseAuth.instance.currentUser;
@@ -66,7 +89,7 @@ class FirebaseService {
     }
   }
 
-// Get user's recent mood rom firestore
+  // Get user's recent mood rom firestore
   Stream<MoodData?> getRecentMood() async* {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -110,5 +133,36 @@ class FirebaseService {
       // Handle sign-up errors
       print('Error signing up: $e');
     }
+  }
+
+  Future<List<UserData>> getFollowingUsers() async {
+    final followingList = await _firestore
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((snapshot) =>
+            snapshot.data()?['following'] as List); // Get following IDs
+
+    if (followingList.isEmpty) {
+      return []; // Return empty list if no following users
+    }
+
+    final userFutures = followingList.map((userId) => _firestore
+        .collection('users')
+        .doc(userId)
+        .get()); // Create futures for each user
+
+    final userSnapshots =
+        await Future.wait(userFutures); // Wait for all futures to complete
+
+    final users = userSnapshots
+        .map((snapshot) => UserData(
+              name: snapshot.data()?['name'] as String,
+              mood: snapshot.data()?['mood'] as String,
+              emoji: snapshot.data()?['emoji'] as String,
+            ))
+        .toList(); // Extract user data and create User objects
+
+    return users;
   }
 }
